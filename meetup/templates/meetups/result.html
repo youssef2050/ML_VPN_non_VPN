@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    {% load static %}
+    {% load bootstrap_icons %}
+    <link href="{% static 'meetup/css/bootstrap.min.css' %}" rel="stylesheet">
+    <script src="{% static 'meetup/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap_icons/css/bootstrap_icons.css' %}">
+</head>
+<body>
+{#nav bar#}
+{% if close %}
+
+    <a href="{% url 'stop' title %}" type="button" class="btn btn-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stop-fill"
+             viewBox="0 0 16 16">
+            <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>
+        </svg>
+        Stop
+    </a>
+{% else %}
+    <a href="{% url 'run' title %}" type="button" class="btn btn-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+             class="bi bi-play" viewBox="0 0 20 20">
+            <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"
+                  style="text-align: center"/>
+        </svg>
+        Run
+    </a>
+{% endif %}
+<br>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">ip src</th>
+        <th scope="col">port src</th>
+        <th scope="col">ip dest</th>
+        <th scope="col">port dest</th>
+        <th scope="col">classifier</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for res in data %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ res.ip_src }}</td>
+            <td>{{ res.port_src }}</td>
+            <td>{{ res.ip_dest }}</td>
+            <td>{{ res.port_dest }}</td>
+            <td>{{ res.classifier }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
