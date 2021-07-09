@@ -15,11 +15,11 @@ class RealTimeCapture:
     @staticmethod
     def liveCapture(interface, outputFilePath):
         global capture
-        capture = pyshark.LiveCapture(interface=interface, output_file='meetup/ML/FilePacp'+str(outputFilePath) + '.pcap')
-        t = threading.Thread(target=capture.sniff, daemon=True)
+        capture = pyshark.LiveCapture(interface=interface, output_file='uploads/files/' + str(outputFilePath) + '.pcap')
+        t = threading.Thread(target=capture.sniff, kwargs={'timeout': 120, 'packet_count': 5000}, daemon=True)
         t.start()
         t.join()
-
+        # GetFeatures.convertToCSV('uploads/files/' + str(outputFilePath) + '.pcap')
 
     @staticmethod
     def closeCapture():

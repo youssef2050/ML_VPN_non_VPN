@@ -1,58 +1,56 @@
+import json
 import threading
 import time
 
+from django.core.serializers import serialize
+from django.http import JsonResponse, HttpResponse
+
+from meetup.ML.CICFlowMeterFeatures.GetFeatures import convertToCSV
 from meetup.ML.RealTimeCapture import RealTimeCapture
-from meetup.ML.KNN import KNN
+from meetup.ML.BGTs import BGTs
 from django.shortcuts import render
+
+from meetup.models import Files, ResultML
 
 
 def index(request):
-    # result= KNN.predict([[411416,2,0,44,0,22,22,22,0,0,0,0,0,106.9477123,4.86125965,411416,0,411416,411416,411416,411416,0,411416,411416,0,0,0,0,0,0,0,0,0,16,0,4.86125965,0,22,22,22,0,0,0,0,0,0,0,0,0,0,0,33,22,0,0,0,0,0,0,0,1,22,0,0,0,0,1,8,0,0,0,0,1.43E+15,0,1.43E+15,1.43E+15]])
+    # result= BGTs.predict([[658,1,1,33,345,33,33,33,0,345,345,345,0,574468.09,3039.51,658,0,658,658,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,1519.76,1519.76,33,345,137,180.13,32448,0,0,0,0,0,0,0,0,1,205.5,33,345,0,0,0,0,0,0,0,16,0,172,0,0,0,8,0,0,0,0,1.43E+15,0,1.43E+15,1.43E+15]])
     result = RealTimeCapture.getInterface
     return render(request, 'meetups/index.html', {'result': result})
 
 
 def runTime(request, interface):
-    if (interface == 'offline'):
+    if interface == 'offline':
         return render(request, 'meetups/uploadFile.html')
     else:
-        data = [
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '8080', 'ip_dest': '172.16.0.215', 'port_dest': '21',
-             'classifier': 'non_vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'non_vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'non_vpn'},
-        ]
-        runLiveCapture(interface)
-    return render(request, 'meetups/result.html', {
-        'title': interface,
-        'data': data,
-        'close': True,
-    })
+        convertToCSV('uploads/files/csv/test.csv')
+        data = Files.objects.all()
+        return render(request, 'meetups/result.html', {
+            'title': interface,
+            'data': data,
+            'close': True,
+        })
 
 
-def runLiveCapture(interface):
+def runLiveCapture(request):
     local_time = time.time()
-    RealTimeCapture.liveCapture(interface, local_time)
+    RealTimeCapture.liveCapture(request.GET.get('interface'), local_time)
+    file = Files(name=local_time, file='files/' + str(local_time) + '.pcap')
+    file.save()
+    return JsonResponse(['is run capture'])
 
 
 def stopCapture(request, interface):
     RealTimeCapture.closeCapture()
-    data = [{'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'non_vpn'},
-            {'ip_src': '192.168.0.1', 'port_src': '5000', 'ip_dest': '29.168.15.205', 'port_dest': '80',
-             'classifier': 'non_vpn'}, ]
+    date = ResultML.objects.all()
     return render(request, 'meetups/result.html', {
         'title': interface,
-        'data': data,
         'close': False,
+        'data': date
     })
+
+
+def getData(request):
+    res = ResultML.objects.all()
+    data = serialize("json", res, fields=('ip_src', 'port_src', 'ip_des', 'port_des', 'classification'))
+    return HttpResponse(data, content_type="application/json")

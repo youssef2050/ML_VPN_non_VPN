@@ -46,11 +46,11 @@
     {% for res in data %}
         <tr>
             <th scope="row">{{ forloop.counter }}</th>
-            <td>{{ res.ip_src }}</td>
-            <td>{{ res.port_src }}</td>
-            <td>{{ res.ip_dest }}</td>
-            <td>{{ res.port_dest }}</td>
-            <td>{{ res.classifier }}</td>
+            <td>{{ res.title }}</td>
+            <td>{{ res.description }}</td>
+            <td>{{ res.slug }}</td>
+{#            <td>{{ res.port_dest }}</td>#}
+{#            <td>{{ res.classifier }}</td>#}
         </tr>
     {% endfor %}
     </tbody>

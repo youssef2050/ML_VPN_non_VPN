@@ -1,8 +1,9 @@
-from meetup.ML.KNN import KNN
+from meetup.ML.BGTs import BGTs
 from django.urls import path
 from . import views
 urlpatterns=[
 path('',views.index),
-path('index/<interface>',views.runTime,name = 'run'),
-path('index/<interface>/stop',views.stopCapture,name = 'stop')
+path('getData',views.getData,name='getData'),
+path('<interface>',views.runTime,name = 'run'),
+path('<interface>/stop',views.stopCapture,name = 'stop')
 ]
