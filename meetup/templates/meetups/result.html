@@ -56,7 +56,7 @@
                     type: "POST",
                     url: "{% url 'stop' %}",
                     dataType: "json",
-                    data: {'interface': '{{ title }}'},
+                    {#data: {'interface': '{{ title }}'},#}
                     success: function (data) {
                         if (!data['close']) {
                             document.getElementById("stop").style.visibility = 'hidden'

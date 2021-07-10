@@ -14,6 +14,7 @@ from meetup.models import Files, ResultML
 
 
 def index(request):
+    convertToCSV('uploads/files/csv/vpn_test.csv')
     # result= BGTs.predict([[658,1,1,33,345,33,33,33,0,345,345,345,0,574468.09,3039.51,658,0,658,658,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,8,1519.76,1519.76,33,345,137,180.13,32448,0,0,0,0,0,0,0,0,1,205.5,33,345,0,0,0,0,0,0,0,16,0,172,0,0,0,8,0,0,0,0,1.43E+15,0,1.43E+15,1.43E+15]])
     result = RealTimeCapture.getInterface
     return render(request, 'meetups/index.html', {'result': result})

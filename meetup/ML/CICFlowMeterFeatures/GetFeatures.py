@@ -12,6 +12,7 @@ def convertToCSV(path):
             port_src = (row[2])
             ip_des = (row[3])
             port_des = (row[4])
+            #
             row.pop(0)
             row.pop(0)
             row.pop(0)

@@ -20,13 +20,13 @@ class BGTs:
         predicted2 = KNNModel.predict(listFeatures)
         predicted3 = RFModel.predict(listFeatures)
         # print(f'predicted1 :{names[predicted1[0]]} predicted2 :{names[predicted2[0]]} predicted3 :{names[predicted3[0]]}')
-        if (predicted1 == 0 and predicted2 == 0 and predicted3 == 0):
+        if (predicted1[0] == 0 and predicted2[0] == 0 and predicted3[0] == 0):
             return names[0]
-        elif (predicted1 == 0 and predicted2 == 0):
+        elif (predicted1[0] == 0 and predicted2[0] == 0):
             return names[0]
-        elif (predicted1 == 0 and predicted3 == 0):
+        elif (predicted1[0] == 0 and predicted3[0] == 0):
             return names[0]
-        elif (predicted2 == 0 and predicted3 == 0):
+        elif (predicted2[0] == 0 and predicted3[0] == 0):
             return names[0]
         else:
             return names[1]
