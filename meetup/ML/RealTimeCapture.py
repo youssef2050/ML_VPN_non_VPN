@@ -13,10 +13,10 @@ class RealTimeCapture:
         return address.keys()
 
     @staticmethod
-    def liveCapture(interface, outputFilePath):
+    def liveCapture(interface, outputFilePath, time=120, packet_count=5000):
         global capture
         capture = pyshark.LiveCapture(interface=interface, output_file='uploads/files/' + str(outputFilePath) + '.pcap')
-        t = threading.Thread(target=capture.sniff, kwargs={'timeout': 120, 'packet_count': 5000}, daemon=True)
+        t = threading.Thread(target=capture.sniff, kwargs={'timeout': time, 'packet_count': packet_count}, daemon=True)
         t.start()
         t.join()
         # GetFeatures.convertToCSV('uploads/files/' + str(outputFilePath) + '.pcap')

@@ -3,8 +3,8 @@ import threading
 import time
 
 from django.core.serializers import serialize
-from django.http import JsonResponse, HttpResponse
-
+from django.http import JsonResponse, HttpResponse, Http404
+from django.core import serializers
 from meetup.ML.CICFlowMeterFeatures.GetFeatures import convertToCSV
 from meetup.ML.RealTimeCapture import RealTimeCapture
 from meetup.ML.BGTs import BGTs
@@ -23,34 +23,45 @@ def runTime(request, interface):
     if interface == 'offline':
         return render(request, 'meetups/uploadFile.html')
     else:
-        convertToCSV('uploads/files/csv/test.csv')
-        data = Files.objects.all()
+        runCapture(interface, 20, 200)
         return render(request, 'meetups/result.html', {
             'title': interface,
-            'data': data,
-            'close': True,
+            'close': False,
         })
 
 
 def runLiveCapture(request):
+    if request.is_ajax and request.method == "POST":
+        runCapture(request.POST.get('interface'), 120, 5000)
+        return JsonResponse({'massage': 'run capture'}, safe=False)
+    else:
+        return Http404
+
+
+def runCapture(interface, timeout, packet_count):
     local_time = time.time()
-    RealTimeCapture.liveCapture(request.GET.get('interface'), local_time)
-    file = Files(name=local_time, file='files/' + str(local_time) + '.pcap')
+    RealTimeCapture.liveCapture(interface, local_time, timeout, packet_count)
+    file = Files(name=local_time, slug=str(local_time), file='files/' + str(local_time) + '.pcap')
     file.save()
-    return JsonResponse(['is run capture'])
+    # time.sleep(120)
+    # runCapture(interface, timeout, packet_count)
 
 
-def stopCapture(request, interface):
-    RealTimeCapture.closeCapture()
-    date = ResultML.objects.all()
-    return render(request, 'meetups/result.html', {
-        'title': interface,
-        'close': False,
-        'data': date
-    })
+def stopCapture(request):
+    if request.is_ajax and request.method == "POST":
+        RealTimeCapture.closeCapture()
+        data = ResultML.objects.all().values('ip_src', 'port_src', 'ip_des', 'port_des', 'classification')
+        return JsonResponse({'data': list(data),
+                             'massage': 'stop capture',
+                             'close': False
+                             }, safe=False)
+    else:
+        return Http404
 
 
 def getData(request):
-    res = ResultML.objects.all()
-    data = serialize("json", res, fields=('ip_src', 'port_src', 'ip_des', 'port_des', 'classification'))
-    return HttpResponse(data, content_type="application/json")
+    if request.is_ajax and request.method == "POST":
+        data = ResultML.objects.all().values('ip_src', 'port_src', 'ip_des', 'port_des', 'classification')
+        return JsonResponse({'data': list(data)}, safe=False)
+    else:
+        return Http404
